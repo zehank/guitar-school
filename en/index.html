@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f0d0b">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f0d0b'/%3E%3Cpath d='M16 5l4 6v5h-8v-5z' fill='%23eeb96f'/%3E%3Ccircle cx='16' cy='21' r='6' fill='%23eeb96f'/%3E%3C/svg%3E">
+<title>Guitar Studio · From zero to your first song</title>
+<meta name="description" content="An interactive, visual guitar course: clickable fretboard, live tuner, chord library, metronome and play-along tabs.">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="shell">
+  <aside class="side">
+    <a class="brand" href="#start">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40"><path d="M13 3h14l-1.6 8H14.6L13 3Z" fill="currentColor" opacity=".9"/><path d="M15 11h10v4H15z" fill="currentColor" opacity=".55"/><path d="M17 15h6v22h-6z" fill="currentColor" opacity=".8"/><path d="M12 28c0-4 3.4-6 8-6s8 2 8 6v7c0 2.4-2 3.4-4 3.4h-8c-2 0-4-1-4-3.4v-7Z" fill="currentColor" opacity=".45"/><circle cx="20" cy="29" r="2.6" fill="#0f0d0b"/></svg>
+      </span>
+      <span class="brand-text"><strong>Guitar Studio</strong><em>LEARN · PLAY · LISTEN</em></span>
+    </a>
+
+    <nav class="nav" aria-label="Course contents">
+      <a href="#start" data-nav="start"><i>01</i><span>Know the guitar<em>Anatomy · Strings</em></span></a>
+      <a href="#posture" data-nav="posture"><i>02</i><span>Posture &amp; hands<em>Hold · Press</em></span></a>
+      <a href="#tune" data-nav="tune"><i>03</i><span>Tuning<em>Pitch · Tuner</em></span></a>
+      <a href="#scale" data-nav="scale"><i>04</i><span>Notes &amp; scales<em>C major · Picking</em></span></a>
+      <a href="#chords" data-nav="chords"><i>05</i><span>Chords<em>Shapes · Changes</em></span></a>
+      <a href="#rhythm" data-nav="rhythm"><i>06</i><span>Rhythm &amp; strumming<em>Metronome · Patterns</em></span></a>
+      <a href="#songs" data-nav="songs"><i>07</i><span>Songs<em>Play-along · Sections</em></span></a>
+      <a href="#practice" data-nav="practice"><i>08</i><span>Practice &amp; quiz<em>Plan · Self-test</em></span></a>
+    </nav>
+
+    <div class="side-foot">
+      <div class="progress">
+        <div class="progress-head"><span>Progress</span><b data-progress-text>0 / 8</b></div>
+        <div class="progress-bar"><i data-progress-bar style="width:0%"></i></div>
+      </div>
+      <p>20 minutes a day beats a two-hour weekend session.</p>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-title"><span data-section-index>01</span><strong data-section-title>Know the guitar</strong></div>
+      <div class="topbar-tools">
+        <a class="btn tiny ghost" href="#tune">Tuner</a>
+        <button class="btn tiny ghost" type="button" data-sound-toggle aria-pressed="false">
+          <span class="dot"></span><span data-sound-label>Sound on</span>
+        </button>
+        <a class="lang-switch" href="../index.html" data-lang-target="../index.html" aria-label="切换到中文">中文</a>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ========== 01 ========== -->
+      <section class="section" id="start" data-title="Know the guitar">
+        <div class="section-head">
+          <p class="eyebrow">01 / BASICS</p>
+          <h2>Meet the instrument <em>in your hands</em></h2>
+          <p class="lead">Six strings and a dozen frets look complicated, but you only need two things: <strong>which string is which note</strong>, and <strong>where the left hand presses while the right hand picks</strong>. Let's name the parts first.</p>
+        </div>
+
+        <div class="card anatomy-card">
+          <div class="card-head">
+            <h3>Parts of the guitar</h3>
+            <span class="hint">Tap a number · or hover over a part</span>
+          </div>
+          <div class="anatomy">
+            <div class="anatomy-figure" id="anatomyMount"></div>
+            <div class="anatomy-list" id="anatomyList"></div>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <div class="card">
+            <div class="card-head"><h3>Six strings — learn these first</h3><span class="hint">Click to hear</span></div>
+            <p class="muted">Standard tuning, thick to thin, is <b>E A D G B E</b>. Strings are numbered from the thinnest: the thinnest is the 1st string, the thickest is the 6th.</p>
+            <div class="string-table" id="stringTable"></div>
+            <p class="tip">Mnemonic: <b>E</b>at <b>A</b>ll <b>D</b>ay, <b>G</b>et <b>B</b>ig <b>E</b>asy — from the 6th string to the 1st.</p>
+          </div>
+          <div class="card">
+            <h3>Three words you'll use every day</h3>
+            <dl class="defs">
+              <div><dt>Fret</dt><dd>The space between the metal bars on the neck. The open string is fret 0; the first space is fret 1.</dd></div>
+              <div><dt>Note names</dt><dd>C D E F G A B, also sung as do re mi fa sol la si.</dd></div>
+              <div><dt>Chord</dt><dd>Several strings pressed and sounded together. Most pop songs are mostly chords.</dd></div>
+            </dl>
+            <p class="tip">Steel-string acoustics are bright and will hurt your fingertips at first; nylon-string classicals are softer. Start on steel if you want to sing along — the soreness fades in about two weeks.</p>
+          </div>
+        </div>
+
+        <div class="lesson-foot">
+          <button class="btn ghost" type="button" data-complete="start"><span>Mark as learned</span></button>
+          <a class="next-link" href="#posture">Next: Posture &amp; hands →</a>
+        </div>
+      </section>
+
+      <!-- ========== 02 ========== -->
+      <section class="section" id="posture" data-title="Posture &amp; hands">
+        <div class="section-head">
+          <p class="eyebrow">02 / BASICS</p>
+          <h2>Dead notes, sore hands, no speed — <em>it's usually posture</em></h2>
+          <p class="lead">Posture isn't a performance of “correct form”. It decides whether you can relax, make notes ring, and move quickly. Lock in these two hands in the first two weeks and everything later gets easier.</p>
+        </div>
+
+        <div class="grid two">
+          <div class="card">
+            <h3><span class="num">A</span>Sitting: three points of contact</h3>
+            <ol class="steps-list">
+              <li>Rest the <b>waist of the guitar</b> on your right thigh, with the body against yours.</li>
+              <li>Angle the soundboard slightly up. The <b>headstock should sit around shoulder height</b> — don't stare down at the fretboard.</li>
+              <li>Let your right forearm rest on the top edge of the body, but don't press the soundboard dead.</li>
+              <li>Keep your back naturally upright. The guitar <b>leans</b> on you; you don't clamp it.</li>
+            </ol>
+            <p class="tip">Standing? Use a strap and set the guitar to the same height as when you sit. Practise sitting, perform standing — keep the feel the same.</p>
+          </div>
+          <div class="card">
+            <h3><span class="num">B</span>Left hand: fingertips, arch, close to the fret</h3>
+            <ol class="steps-list">
+              <li>Thumb on the <b>centre of the back of the neck</b>, opposite the index finger. Don't wrap your whole hand around it.</li>
+              <li>Arch the first knuckle and press with the <b>fingertip</b>, not the pad.</li>
+              <li>Press <b>1–2 mm to the left of the fret wire</b> (toward the headstock) — not on the metal, not in the middle of the space.</li>
+              <li>Push the wrist slightly forward to give your fingers room.</li>
+            </ol>
+            <p class="tip">If a note won't ring, check in this order: position → pressure → a finger touching the neighbouring string.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Two millimetres make a big difference</h3><span class="hint">Side view</span></div>
+          <div class="hand-figure" id="handDiagram"></div>
+        </div>
+
+        <div class="grid two">
+          <div class="card">
+            <div class="card-head"><h3><span class="num">C</span>Right hand: the wrist does the work</h3></div>
+            <div class="pick-figure" id="pickDiagram"></div>
+            <ul class="clean-list">
+              <li>Hold the pick between thumb and index with <b>2–3 mm</b> showing. Don't squeeze.</li>
+              <li>Angle the pick <b>30–45°</b> to the string. Downstroke with the tip, upstroke with the back edge.</li>
+              <li>The <b>wrist</b> moves, not the whole arm. Imagine flicking water off your hand.</li>
+              <li>Fingerstyle: thumb covers strings 6/5/4; index 3, middle 2, ring 1.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3><span class="num">D</span>Four common mistakes</h3>
+            <div class="mistake"><b>Flat fingers</b><span>The pad mutes the next string. Stand the fingers up.</span></div>
+            <div class="mistake"><b>Pressing on the fret</b><span>No length of string is left to vibrate; the note thuds. Move 2 mm left.</span></div>
+            <div class="mistake"><b>Thumb wrapped over</b><span>Your fingers can't stretch and changes get slow. Put the thumb back behind the neck.</span></div>
+            <div class="mistake"><b>Collapsed wrist</b><span>You can't reach the low strings and your hand cramps. Push the wrist forward.</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Self-check before you play</h3><span class="hint">Tick them all first</span></div>
+          <div class="check-list" id="postureChecks"></div>
+        </div>
+
+        <div class="lesson-foot">
+          <button class="btn ghost" type="button" data-complete="posture"><span>Mark as learned</span></button>
+          <a class="next-link" href="#tune">Next: Tuning →</a>
+        </div>
+      </section>
+
+      <!-- ========== 03 ========== -->
+      <section class="section" id="tune" data-title="Tuning">
+        <div class="section-head">
+          <p class="eyebrow">03 / SETUP</p>
+          <h2>Tune before you play. <em>Every time.</em></h2>
+          <p class="lead">If the guitar is out of tune, practice makes your ear worse — it memorises the wrong pitch. Standard pitch is <b>A4 = 440 Hz</b>. Thick to thin: E2 · A2 · D3 · G3 · B3 · E4.</p>
+        </div>
+
+        <div class="card tuner-card" id="tunerMount"></div>
+
+        <div class="grid two">
+          <div class="card">
+            <h3>Tuning in five steps</h3>
+            <ol class="steps-list">
+              <li>Start on the <b>6th string</b>. Pluck it gently and let it ring.</li>
+              <li>Watch the needle: <b>flat → tighten slowly</b>; sharp → loosen.</li>
+              <li>Turn the peg no more than <b>a quarter turn</b> at a time, listening as you go.</li>
+              <li>When the needle sits in the green and holds for two seconds, move to the next string.</li>
+              <li>After all six, <b>check the 6th again</b> — tuning one string changes the neck tension.</li>
+            </ol>
+            <p class="tip">New strings drift for the first three days. That's normal. Tune every time you pick up the guitar; after a week they'll settle.</p>
+          </div>
+          <div class="card">
+            <h3>No tuner? Tune by ear</h3>
+            <p class="muted">If one string is already in tune, use it as a reference, one string at a time. “Hear the pair” plays the reference note, then the target open string.</p>
+            <div class="relative-table" id="relativeTuning"></div>
+            <p class="tip">The intervals: 6th string, 5th fret = open 5th; 5th string, 5th fret = open 4th; 4th string, 5th fret = open 3rd; <b>3rd string, 4th fret</b> = open 2nd; 2nd string, 5th fret = open 1st.</p>
+          </div>
+        </div>
+
+        <div class="notice">
+          <b>Two safety notes</b>
+          <span>Turn the pegs slowly; never more than half a turn at once. Pluck gently when tuning. A string can snap, especially when it's new.</span>
+        </div>
+
+        <div class="lesson-foot">
+          <button class="btn ghost" type="button" data-complete="tune"><span>Mark as learned</span></button>
+          <a class="next-link" href="#scale">Next: Notes &amp; scales →</a>
+        </div>
+      </section>
+
+      <!-- ========== 04 ========== -->
+      <section class="section" id="scale" data-title="Notes &amp; scales">
+        <div class="section-head">
+          <p class="eyebrow">04 / SINGLE NOTES</p>
+          <h2>First, make every note <em>ring clearly</em></h2>
+          <p class="lead">Don't rush into chords. Use single notes to get “left hand presses accurately + right hand picks cleanly” working. Then chords come much faster. The fretboard below is live — click anywhere.</p>
+        </div>
+
+        <div class="card board-card">
+          <div class="card-head">
+            <h3>C major scale · first position</h3>
+            <div class="seg" id="scaleModes" role="group" aria-label="Fretboard labels">
+              <button type="button" data-mode="scale" class="is-on">C major</button>
+              <button type="button" data-mode="all">All notes</button>
+              <button type="button" data-mode="none">No labels</button>
+            </div>
+          </div>
+          <div class="board-scroll"><div id="scaleBoard"></div></div>
+          <div class="board-foot">
+            <span class="now-chip" id="scaleNow">Click anywhere on the fretboard</span>
+            <span class="legend">
+              <i class="lg-root"></i>Root C
+              <i class="lg-third"></i>3rd / 5th
+              <i class="lg-other"></i>Other notes
+            </span>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <div class="card">
+            <h3>Where the major scale comes from</h3>
+            <p class="muted">Two neighbouring frets are a <b>half step</b>; skipping one is a <b>whole step</b>. The major scale formula is: whole · whole · half · whole · whole · whole · half.</p>
+            <div class="interval-row" id="intervalRow"></div>
+            <p class="tip">Learn the formula and you can build a major scale on any string without memorising dots.</p>
+          </div>
+          <div class="card">
+            <h3>Right hand: make the picking steady</h3>
+            <ul class="clean-list">
+              <li>Pick <b>straight into the string</b> at a slight 30° angle — the cleanest tone.</li>
+              <li>Downstroke (↓) with the tip; upstroke (↑) with the back edge.</li>
+              <li>At slow tempos use <b>all downstrokes</b> for even tone; alternate when comfortable.</li>
+              <li>Fingerstyle: thumb on the low strings; index, middle and ring on 3, 2, 1.</li>
+            </ul>
+            <p class="tip">The test: close your eyes. Twelve notes should sound like one straight line — no note popping out.</p>
+          </div>
+        </div>
+
+        <div class="section-sub">
+          <h3>Three exercises to start today</h3>
+          <p class="muted">Each one has a Play button. Click any note in the tab to hear it on its own.</p>
+        </div>
+        <div class="exercise-list" id="exerciseList"></div>
+
+        <div class="lesson-foot">
+          <button class="btn ghost" type="button" data-complete="scale"><span>Mark as learned</span></button>
+          <a class="next-link" href="#chords">Next: Chords →</a>
+        </div>
+      </section>
+
+      <!-- ========== 05 ========== -->
+      <section class="section" id="chords" data-title="Chords">
+        <div class="section-head">
+          <p class="eyebrow">05 / CHORDS</p>
+          <h2>Eight chords, <em>half a songbook</em></h2>
+          <p class="lead">Most pop songs live in a handful of chords. The goal isn't “knowing the shape” — it's making it ring first time without looking.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Reading a chord diagram</h3><span class="hint">Vertical: 6th string left → 1st right</span></div>
+          <div class="chord-guide">
+            <div class="chord-guide-figure" id="chordGuide"></div>
+            <div class="chord-guide-text">
+              <ul class="clean-list">
+                <li>The <b>thick line at the top</b> is the nut (fret 0); each line below is a fret.</li>
+                <li><b>Dots</b> show where the fingers go. The number inside is the finger: 1 index, 2 middle, 3 ring, 4 pinky.</li>
+                <li><b>○</b> open string, play it; <b>×</b> don't play it, keep the right hand away.</li>
+                <li>Left to right is <b>6 5 4 3 2 1</b>, matching the string names underneath.</li>
+              </ul>
+              <p class="tip">The order is always: <b>place the fingers → check each string → then strum</b>. Never strum first.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-sub chord-sub">
+          <h3>Chord library</h3>
+          <div class="seg" id="chordFilter" role="group" aria-label="Chord difficulty">
+            <button type="button" data-level="all" class="is-on">All</button>
+            <button type="button" data-level="1">Beginner</button>
+            <button type="button" data-level="2">Advanced</button>
+          </div>
+        </div>
+        <div class="chord-grid" id="chordGrid"></div>
+
+        <div class="chord-detail" id="chordDetail"></div>
+
+        <div class="card trainer-card" id="chordTrainer"></div>
+
+        <div class="lesson-foot">
+          <button class="btn ghost" type="button" data-complete="chords"><span>Mark as learned</span></button>
+          <a class="next-link" href="#rhythm">Next: Rhythm &amp; strumming →</a>
+        </div>
+      </section>
+
+      <!-- ========== 06 ========== -->
+      <section class="section" id="rhythm" data-title="Rhythm &amp; strumming">
+        <div class="section-head">
+          <p class="eyebrow">06 / RHYTHM</p>
+          <h2>Steady rhythm is worth more <em>than hard chords</em></h2>
+          <p class="lead">Most people's strumming sounds bad not because of the hand shape, but because the beat wanders. Get “one strum per beat” into your muscle memory first, then add decoration.</p>
+        </div>
+
+        <div class="card metro-card" id="metroMount"></div>
+
+        <div class="section-sub">
+          <h3>Four patterns, simple to fancy</h3>
+          <p class="muted">Click a card to hear it; the arrows light up below. Air-strum along before you touch the strings.</p>
+        </div>
+        <div class="pattern-grid" id="patternMount"></div>
+        <div class="card pattern-board" id="patternBoard"></div>
+
+        <div class="grid three">
+          <div class="card mini">
+            <h3>Wrist, not arm</h3>
+            <p>Strumming is a small arc from the wrist; the forearm barely moves. Move the arm and you lose speed and hit the wrong strings.</p>
+          </div>
+          <div class="card mini">
+            <h3>Keep the hand moving</h3>
+            <p>Even when you don't hit the strings, keep the hand swinging in time. Stopping is the number one cause of a late next beat.</p>
+          </div>
+          <div class="card mini">
+            <h3>Light before loud</h3>
+            <p>Volume comes from wrist travel, not force. Hitting harder causes fret buzz and broken strings, and sounds smaller.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Practice order (don't skip)</h3>
+          <ol class="steps-list">
+            <li><b>60 BPM</b>, downstrokes only, one per beat, two minutes without drifting.</li>
+            <li>Move to <b>80 BPM</b>, still downstrokes; check the wrist hasn't stiffened.</li>
+            <li>Learn “down, down-up, up-down-up” in the air first, then on the strings.</li>
+            <li>Loop <b>C → G → Am → F</b>, one bar each, changing slowly.</li>
+            <li>Play along to a three-minute song all the way through before adding speed.</li>
+          </ol>
+        </div>
+
+        <div class="lesson-foot">
+          <button class="btn ghost" type="button" data-complete="rhythm"><span>Mark as learned</span></button>
+          <a class="next-link" href="#songs">Next: Songs →</a>
+        </div>
+      </section>
+
+      <!-- ========== 07 ========== -->
+      <section class="section" id="songs" data-title="Songs">
+        <div class="section-head">
+          <p class="eyebrow">07 / PLAY</p>
+          <h2>Follow the highlight, <em>one note at a time</em></h2>
+          <p class="lead">Press Play and the tab highlights each note in time; the fretboard shows where to press. You can also click any note in the tab to hear it alone.</p>
+        </div>
+
+        <div class="song-picker" id="songList"></div>
+        <div id="playerMount"></div>
+
+        <div class="card">
+          <h3>How to learn a song (in this order)</h3>
+          <ol class="steps-list">
+            <li><b>Section it</b>: work on 2–4 bars at a time, not the whole song.</li>
+            <li><b>Slow it down</b>: 60–70% tempo, slow enough that you don't miss.</li>
+            <li><b>Loop it</b>: ten clean passes of the same section builds muscle memory.</li>
+            <li><b>Join it</b>: once each section works alone, connect them.</li>
+            <li><b>Record it</b>: one phone recording and you'll hear the problem instantly.</li>
+          </ol>
+          <p class="tip">Wrong notes aren't the danger; practising them at speed is. Slow practice is the only shortcut.</p>
+        </div>
+
+        <div class="lesson-foot">
+          <button class="btn ghost" type="button" data-complete="songs"><span>Mark as learned</span></button>
+          <a class="next-link" href="#practice">Next: Practice &amp; quiz →</a>
+        </div>
+      </section>
+
+      <!-- ========== 08 ========== -->
+      <section class="section" id="practice" data-title="Practice &amp; quiz">
+        <div class="section-head">
+          <p class="eyebrow">08 / KEEP GOING</p>
+          <h2>20 minutes a day, <em>a song in two weeks</em></h2>
+          <p class="lead">Practice isn't “when I have time”. It's a small amount at the same time every day. Here's a plan and a self-test to make it stick.</p>
+        </div>
+
+        <div class="grid two">
+          <div class="card">
+            <div class="card-head"><h3>Today's 20 minutes</h3><span class="hint" id="todayLabel">—</span></div>
+            <div class="plan-list" id="planList"></div>
+            <div class="plan-bar"><i data-plan-bar style="width:0%"></i></div>
+            <p class="tip">The order can change, but every day should include chords + rhythm + a song.</p>
+          </div>
+          <div class="card">
+            <h3>7-day starter plan</h3>
+            <div class="day-table" id="dayTable"></div>
+          </div>
+        </div>
+
+        <div class="section-sub">
+          <h3>Self-test: did it stick?</h3>
+          <p class="muted">Find-the-note trains the fretboard; ear training trains your ear. Don't chase a perfect score — use “Hear it again”.</p>
+        </div>
+        <div id="quizMount"></div>
+
+        <div class="card">
+          <h3>Four questions every beginner asks</h3>
+          <div class="faq">
+            <details>
+              <summary>My notes won't ring, or buzz. What do I check?</summary>
+              <p>In order: ① is the finger 1–2 mm to the left of the fret wire; ② is it upright, with the pad clear of the neighbouring string; ③ is there enough pressure. Most dead notes are position, not strength.</p>
+            </details>
+            <details>
+              <summary>Is fingertip pain normal?</summary>
+              <p>For the first two weeks, yes — calluses form and it stops. But sharp joint pain means stop and rest a day. Two 10-minute sessions beat one long one, and hurt less.</p>
+            </details>
+            <details>
+              <summary>How do I change chords faster?</summary>
+              <p>Three tricks: ① keep <b>common fingers</b> down between chords; ② move the <b>lowest note first</b> so the strum starts right; ③ look ahead to the next shape. Then use a metronome and change every four beats, slow enough to keep up.</p>
+            </details>
+            <details>
+              <summary>Theory first, or playing first?</summary>
+              <p>Both, but playing leads. For each chord, know the three notes it contains; for each scale, know where it sits on the neck. Reading theory without touching the guitar is very slow progress.</p>
+            </details>
+          </div>
+        </div>
+
+        <div class="closing">
+          <p class="eyebrow">ONE LAST THING</p>
+          <h3>Slow is fast.</h3>
+          <p>Make every note clean and count every beat. Time does the rest. In two weeks you'll have a song you can play all the way through.</p>
+        </div>
+
+        <div class="lesson-foot">
+          <button class="btn ghost" type="button" data-complete="practice"><span>Mark as learned</span></button>
+          <a class="next-link" href="#start">Back to the top ↑</a>
+        </div>
+      </section>
+
+      <footer class="site-foot">
+        <span>Guitar Studio · every sound is synthesised in your browser; no audio files</span>
+        <span>Headphones help you hear the strings</span>
+      </footer>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/data.js"></script>
+<script src="../assets/i18n.js"></script>
+<script src="../assets/audio.js"></script>
+<script src="../assets/visuals.js"></script>
+<script src="../assets/app.js"></script>
+</body>
+</html>

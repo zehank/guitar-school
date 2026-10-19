@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f0d0b">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f0d0b'/%3E%3Cpath d='M16 5l4 6v5h-8v-5z' fill='%23eeb96f'/%3E%3Ccircle cx='16' cy='21' r='6' fill='%23eeb96f'/%3E%3C/svg%3E">
+<title>吉他自习室 · 从零到能弹一首歌</title>
+<meta name="description" content="一个可以点、可以听、可以跟着弹的吉他从零教学站：交互指板、调音器、和弦库、节拍器和逐音高亮的曲谱。">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="shell">
+  <aside class="side">
+    <a class="brand" href="#start">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40"><path d="M13 3h14l-1.6 8H14.6L13 3Z" fill="currentColor" opacity=".9"/><path d="M15 11h10v4H15z" fill="currentColor" opacity=".55"/><path d="M17 15h6v22h-6z" fill="currentColor" opacity=".8"/><path d="M12 28c0-4 3.4-6 8-6s8 2 8 6v7c0 2.4-2 3.4-4 3.4h-8c-2 0-4-1-4-3.4v-7Z" fill="currentColor" opacity=".45"/><circle cx="20" cy="29" r="2.6" fill="#0f0d0b"/></svg>
+      </span>
+      <span class="brand-text"><strong>吉他自习室</strong><em>GUITAR STUDIO</em></span>
+    </a>
+
+    <nav class="nav" aria-label="课程目录">
+      <a href="#start" data-nav="start"><i>01</i><span>认识吉他<em>构造 · 定弦</em></span></a>
+      <a href="#posture" data-nav="posture"><i>02</i><span>姿势与手型<em>持琴 · 按弦</em></span></a>
+      <a href="#tune" data-nav="tune"><i>03</i><span>调音<em>标准音 · 调音器</em></span></a>
+      <a href="#scale" data-nav="scale"><i>04</i><span>音阶与单音<em>C 大调 · 拨弦</em></span></a>
+      <a href="#chords" data-nav="chords"><i>05</i><span>和弦<em>指法 · 转换</em></span></a>
+      <a href="#rhythm" data-nav="rhythm"><i>06</i><span>节奏与扫弦<em>节拍器 · 节奏型</em></span></a>
+      <a href="#songs" data-nav="songs"><i>07</i><span>曲目实战<em>跟弹 · 分段</em></span></a>
+      <a href="#practice" data-nav="practice"><i>08</i><span>练习与测验<em>计划 · 自测</em></span></a>
+    </nav>
+
+    <div class="side-foot">
+      <div class="progress">
+        <div class="progress-head"><span>学习进度</span><b data-progress-text>0 / 8</b></div>
+        <div class="progress-bar"><i data-progress-bar style="width:0%"></i></div>
+      </div>
+      <p>每天 20 分钟，比周末一次练两小时有用得多。</p>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-title"><span data-section-index>01</span><strong data-section-title>认识吉他</strong></div>
+      <div class="topbar-tools">
+        <a class="btn tiny ghost" href="#tune">调音器</a>
+        <button class="btn tiny ghost" type="button" data-sound-toggle aria-pressed="false">
+          <span class="dot"></span><span data-sound-label>声音开</span>
+        </button>
+        <a class="lang-switch" href="en/index.html" data-lang-target="en/index.html" aria-label="Switch to English">EN</a>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- ========== 01 认识吉他 ========== -->
+      <section class="section" id="start" data-title="认识吉他">
+        <div class="section-head">
+          <p class="eyebrow">01 / 基础</p>
+          <h2>先认识你手里的<em>这件乐器</em></h2>
+          <p class="lead">六根弦、十几个品格，看着复杂，其实只需要记住两件事：<strong>哪根弦是哪个音</strong>，以及<strong>左手按哪里、右手拨哪里</strong>。这一节先把名字认全。</p>
+        </div>
+
+        <div class="card anatomy-card">
+          <div class="card-head">
+            <h3>吉他构造</h3>
+            <span class="hint">点图上编号 · 或移到条目上查看</span>
+          </div>
+          <div class="anatomy">
+            <div class="anatomy-figure" id="anatomyMount"></div>
+            <div class="anatomy-list" id="anatomyList"></div>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <div class="card">
+            <div class="card-head"><h3>六根弦，先背下来</h3><span class="hint">点一下听声音</span></div>
+            <p class="muted">标准调音从粗到细是 <b>E A D G B E</b>。数弦从最细的那根开始：最细 = 1 弦，最粗 = 6 弦。</p>
+            <div class="string-table" id="stringTable"></div>
+            <p class="tip">记忆口诀：<b>E</b>at <b>A</b>ll <b>D</b>ay, <b>G</b>et <b>B</b>ig <b>E</b>asy —— 从 6 弦念到 1 弦。</p>
+          </div>
+          <div class="card">
+            <h3>三个最常用的词</h3>
+            <dl class="defs">
+              <div><dt>品（fret）</dt><dd>指板上金属条之间的格子。空弦记 0 品，第一个格子是 1 品。</dd></div>
+              <div><dt>音名</dt><dd>C D E F G A B，对应唱名 do re mi fa sol la si。</dd></div>
+              <div><dt>和弦</dt><dd>同时按住几根弦、一起发声。流行歌大部分时间都在按和弦。</dd></div>
+            </dl>
+            <p class="tip">民谣吉他是钢弦，声音亮、手指会痛；古典吉他是尼龙弦，声音柔、按起来软。初学通常从钢弦民谣开始，痛感两周后会过去。</p>
+          </div>
+        </div>
+
+        <div class="lesson-foot">
+          <button class="btn ghost" type="button" data-complete="start"><span>标记本节已学</span></button>
+          <a class="next-link" href="#posture">下一节：姿势与手型 →</a>
+        </div>
+      </section>
+
+      <!-- ========== 02 姿势与手型 ========== -->
+      <section class="section" id="posture" data-title="姿势与手型">
+        <div class="section-head">
+          <p class="eyebrow">02 / 基础</p>
+          <h2>弹不响、手酸、速度上不去，<em>多半是姿势</em></h2>
+          <p class="lead">姿势不是「标准动作」表演，它决定了你能不能省力、能不能按响、能不能弹快。前两周就把这两只手固定下来，后面省很多事。</p>
+        </div>
+
+        <div class="grid two">
+          <div class="card">
+            <h3><span class="num">A</span>坐姿：三点支撑</h3>
+            <ol class="steps-list">
+              <li><b>琴身凹槽</b>放在右腿大腿上，琴身贴住身体。</li>
+              <li>面板稍微朝上，<b>琴头与肩同高</b>，不要低头盯着指板。</li>
+              <li>右前臂轻轻压在琴身顶部，但不要把面板压死。</li>
+              <li>腰背自然直立，琴是「靠」在你身上的，不是「夹」住的。</li>
+            </ol>
+            <p class="tip">站着弹时用背带，把琴调到和坐着时一样的高度。练琴时坐着，演出时站着，手感才一致。</p>
+          </div>
+          <div class="card">
+            <h3><span class="num">B</span>左手：指尖、立指、靠近品丝</h3>
+            <ol class="steps-list">
+              <li>拇指放在<b>琴颈背面中线</b>，和食指相对，不要整只手扣住琴颈。</li>
+              <li>手指第一关节拱起来，用<b>指尖</b>按弦，不是指肚。</li>
+              <li>按在<b>品丝左侧 1–2mm</b>，不要压在金属条上，也不要缩在格子中间。</li>
+              <li>手腕稍微向前送，让手指有活动空间。</li>
+            </ol>
+            <p class="tip">按不响的三个原因，按顺序检查：位置不对 → 力度不够 → 手指碰到了旁边的弦。</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>按弦的位置，差 2 毫米差别很大</h3><span class="hint">侧视图</span></div>
+          <div class="hand-figure" id="handDiagram"></div>
+        </div>
+
+        <div class="grid two">
+          <div class="card">
+            <div class="card-head"><h3><span class="num">C</span>右手：手腕发力</h3></div>
+            <div class="pick-figure" id="pickDiagram"></div>
+            <ul class="clean-list">
+              <li>拨片用拇指和食指捏住，露出 <b>2–3mm</b>，不要捏死。</li>
+              <li>拨片与弦约 <b>30–45°</b>，下扫用尖端，上扫用背面。</li>
+              <li>发力的是<b>手腕</b>，不是整条手臂。想象甩掉手上的水。</li>
+              <li>指弹时：拇指管 6/5/4 弦，食指 3 弦，中指 2 弦，无名指 1 弦。</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3><span class="num">D</span>四个最常见的错误</h3>
+            <div class="mistake"><b>手指趴平</b><span>指肚压到旁边的弦，声音缺一根。把手指立起来。</span></div>
+            <div class="mistake"><b>按在品丝上</b><span>弦没有有效长度，声音发闷、没有延音。往左挪 2mm。</span></div>
+            <div class="mistake"><b>拇指扣住琴颈</b><span>手指张不开，换和弦慢。拇指回到琴颈背面。</span></div>
+            <div class="mistake"><b>手腕塌下去</b><span>手指够不到低音弦，还容易酸。把手腕向前送。</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>上手前自检</h3><span class="hint">勾完再开始弹</span></div>
+          <div class="check-list" id="postureChecks"></div>
+        </div>
+
+        <div class="lesson-foot">
+          <button class="btn ghost" type="button" data-complete="posture"><span>标记本节已学</span></button>
+          <a class="next-link" href="#tune">下一节：调音 →</a>
+        </div>
+      </section>
+
+      <!-- ========== 03 调音 ========== -->
+      <section class="section" id="tune" data-title="调音">
+        <div class="section-head">
+          <p class="eyebrow">03 / 准备</p>
+          <h2>每次拿起琴，<em>先调音</em></h2>
+          <p class="lead">音不准，练得越久越糟——你的耳朵会记住错误的音高。标准音 <b>A4 = 440Hz</b>，六根弦从粗到细是 E2 · A2 · D3 · G3 · B3 · E4。</p>
+        </div>
+
+        <div class="card tuner-card" id="tunerMount"></div>
+
+        <div class="grid two">
+          <div class="card">
+            <h3>调音五步</h3>
+            <ol class="steps-list">
+              <li>从 <b>6 弦</b>开始，轻轻拨一下，让音持续响。</li>
+              <li>看指针：<b>偏低 → 慢慢拧紧</b>，偏高 → 放松。</li>
+              <li>每次转动不超过 <b>1/4 圈</b>，边拧边听。</li>
+              <li>指针进绿区、稳定两秒，再调下一根。</li>
+              <li>六根都调完，<b>回头再查一遍 6 弦</b>——调别的弦会改变琴颈张力。</li>
+            </ol>
+            <p class="tip">新换的弦前三天会一直跑音，正常。每次弹之前调一遍，一周后就会稳定。</p>
+          </div>
+          <div class="card">
+            <h3>没有调音器也能调：相对调音法</h3>
+            <p class="muted">用已经调准的弦当参照，一根一根对。点「听这对」会先响参照音，再响目标空弦。</p>
+            <div class="relative-table" id="relativeTuning"></div>
+            <p class="tip">原理：6 弦 5 品 = 5 弦空弦，5 弦 5 品 = 4 弦空弦，4 弦 5 品 = 3 弦空弦，<b>3 弦 4 品</b> = 2 弦空弦，2 弦 5 品 = 1 弦空弦。</p>
+          </div>
+        </div>
+
+        <div class="notice">
+          <b>两个安全提醒</b>
+          <span>拧弦钮时慢慢来，一次别超过半圈；调音时轻拨，不要用力扫。弦绷得太紧会断，换弦时尤其注意。</span>
+        </div>
+
+        <div class="lesson-foot">
+          <button class="btn ghost" type="button" data-complete="tune"><span>标记本节已学</span></button>
+          <a class="next-link" href="#scale">下一节：音阶与单音 →</a>
+        </div>
+      </section>
+
+      <!-- ========== 04 音阶与单音 ========== -->
+      <section class="section" id="scale" data-title="音阶与单音">
+        <div class="section-head">
+          <p class="eyebrow">04 / 单音</p>
+          <h2>先让每个音<em>干净地响出来</em></h2>
+          <p class="lead">先别急着学和弦。用单音把「左手按准 + 右手拨清楚」练顺，后面学和弦会快很多。下面这块指板可以直接点，每个位置都会发声。</p>
+        </div>
+
+        <div class="card board-card">
+          <div class="card-head">
+            <h3>C 大调音阶 · 第一把位</h3>
+            <div class="seg" id="scaleModes" role="group" aria-label="指板显示模式">
+              <button type="button" data-mode="scale" class="is-on">C 大调</button>
+              <button type="button" data-mode="all">全部音名</button>
+              <button type="button" data-mode="none">只看指板</button>
+            </div>
+          </div>
+          <div class="board-scroll"><div id="scaleBoard"></div></div>
+          <div class="board-foot">
+            <span class="now-chip" id="scaleNow">点一下指板上的任意位置</span>
+            <span class="legend">
+              <i class="lg-root"></i>根音 C
+              <i class="lg-third"></i>三音 / 五音
+              <i class="lg-other"></i>其他音
+            </span>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <div class="card">
+            <h3>C 大调是怎么来的</h3>
+            <p class="muted">相邻两品是<b>半音</b>，隔一品是<b>全音</b>。大调音阶的公式是：全 · 全 · 半 · 全 · 全 · 全 · 半。</p>
+            <div class="interval-row" id="intervalRow"></div>
+            <p class="tip">记住这个公式，你就能在任何一根弦上推出大调音阶，不用死背格子。</p>
+          </div>
+          <div class="card">
+            <h3>右手：先把拨弦练稳</h3>
+            <ul class="clean-list">
+              <li>拨片<b>垂直弦</b>、稍微斜 30°，声音最干净。</li>
+              <li>下拨（↓）用拨片尖端，上拨（↑）用背面。</li>
+              <li>慢速时每个音都<b>下拨</b>，先把音色练一致；熟练后再上下交替。</li>
+              <li>手指拨弦：拇指负责低音弦，食指、中指、无名指负责 3、2、1 弦。</li>
+            </ul>
+            <p class="tip">判断标准：闭眼听，十二个音的音量应该像一条直线，没有突然变大或变小。</p>
+          </div>
+        </div>
+
+        <div class="section-sub">
+          <h3>三条练习，从今天开始</h3>
+          <p class="muted">每条都可以点「播放」跟着弹。先点谱子上的任意一个音，听一下它该是什么声音。</p>
+        </div>
+        <div class="exercise-list" id="exerciseList"></div>
+
+        <div class="lesson-foot">
+          <button class="btn ghost" type="button" data-complete="scale"><span>标记本节已学</span></button>
+          <a class="next-link" href="#chords">下一节：和弦 →</a>
+        </div>
+      </section>
+
+      <!-- ========== 05 和弦 ========== -->
+      <section class="section" id="chords" data-title="和弦">
+        <div class="section-head">
+          <p class="eyebrow">05 / 和弦</p>
+          <h2>八个和弦，<em>能弹半个歌单</em></h2>
+          <p class="lead">流行歌大部分时间就在这几个和弦里转。目标不是「知道怎么按」，而是「不用看也能一次按响」。</p>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>先学会看和弦图</h3><span class="hint">竖着看：左 6 弦 → 右 1 弦</span></div>
+          <div class="chord-guide">
+            <div class="chord-guide-figure" id="chordGuide"></div>
+            <div class="chord-guide-text">
+              <ul class="clean-list">
+                <li><b>最上面粗线</b>是琴枕（0 品）；后面每条横线是一个品。</li>
+                <li><b>圆点</b>表示手指按的位置，点里的数字是手指：1 食指、2 中指、3 无名指、4 小指。</li>
+                <li><b>○</b> 空弦，要弹；<b>×</b> 不弹，右手别碰到。</li>
+                <li>从左到右是 <b>6 5 4 3 2 1</b> 弦，和最下面的弦名对应。</li>
+              </ul>
+              <p class="tip">按和弦的顺序永远是：<b>先摆手指 → 逐弦检查 → 再扫弦</b>。不要一上来就扫。</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-sub chord-sub">
+          <h3>和弦库</h3>
+          <div class="seg" id="chordFilter" role="group" aria-label="和弦难度筛选">
+            <button type="button" data-level="all" class="is-on">全部</button>
+            <button type="button" data-level="1">入门</button>
+            <button type="button" data-level="2">进阶</button>
+          </div>
+        </div>
+        <div class="chord-grid" id="chordGrid"></div>
+
+        <div class="chord-detail" id="chordDetail"></div>
+
+        <div class="card trainer-card" id="chordTrainer"></div>
+
+        <div class="lesson-foot">
+          <button class="btn ghost" type="button" data-complete="chords"><span>标记本节已学</span></button>
+          <a class="next-link" href="#rhythm">下一节：节奏与扫弦 →</a>
+        </div>
+      </section>
+
+      <!-- ========== 06 节奏与扫弦 ========== -->
+      <section class="section" id="rhythm" data-title="节奏与扫弦">
+        <div class="section-head">
+          <p class="eyebrow">06 / 节奏</p>
+          <h2>节奏稳，<em>比和弦难按更值钱</em></h2>
+          <p class="lead">大部分人扫弦难听，不是手型问题，是拍子不稳。先用节拍器把「每拍一下」练成肌肉记忆，再加花样。</p>
+        </div>
+
+        <div class="card metro-card" id="metroMount"></div>
+
+        <div class="section-sub">
+          <h3>四个节奏型，从简单到花</h3>
+          <p class="muted">点卡片试听，下面的箭头会跟着亮。先跟着亮起的箭头空手挥，再上琴。</p>
+        </div>
+        <div class="pattern-grid" id="patternMount"></div>
+        <div class="card pattern-board" id="patternBoard"></div>
+
+        <div class="grid three">
+          <div class="card mini">
+            <h3>手腕，不是手臂</h3>
+            <p>扫弦是手腕画的小弧线，前臂几乎不动。手臂一动，速度就上不去，还容易扫错弦。</p>
+          </div>
+          <div class="card mini">
+            <h3>手不要停</h3>
+            <p>即使这一拍不扫，手也要按节奏空挥。停顿会让下一拍迟到，这是节奏不稳的头号原因。</p>
+          </div>
+          <div class="card mini">
+            <h3>先轻后重</h3>
+            <p>扫弦音量靠手腕幅度控制，不是靠用力砸。用力过猛会打品、断弦，声音反而更小。</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>练习顺序（别跳）</h3>
+          <ol class="steps-list">
+            <li><b>60 BPM</b>，只下扫，每拍一下，连续 2 分钟不错拍。</li>
+            <li>加到 <b>80 BPM</b>，还是只下扫，确认手腕没有变僵。</li>
+            <li>学「下 下上 · 上下上」，先在空气中挥手，再上琴。</li>
+            <li>用 <b>C → G → Am → F</b> 循环，每个和弦一小节，慢速换。</li>
+            <li>能连续跟完一整首 3 分钟的歌，再考虑加速。</li>
+          </ol>
+        </div>
+
+        <div class="lesson-foot">
+          <button class="btn ghost" type="button" data-complete="rhythm"><span>标记本节已学</span></button>
+          <a class="next-link" href="#songs">下一节：曲目实战 →</a>
+        </div>
+      </section>
+
+      <!-- ========== 07 曲目实战 ========== -->
+      <section class="section" id="songs" data-title="曲目实战">
+        <div class="section-head">
+          <p class="eyebrow">07 / 实战</p>
+          <h2>跟着高亮，<em>一个音一个音地弹</em></h2>
+          <p class="lead">点「播放」会按节拍逐音高亮，指板上同步显示按哪里。也可以直接点谱子上的任意一个音，单独听、单独练。</p>
+        </div>
+
+        <div class="song-picker" id="songList"></div>
+        <div id="playerMount"></div>
+
+        <div class="card">
+          <h3>一首歌怎么练（照这个顺序）</h3>
+          <ol class="steps-list">
+            <li><b>分段</b>：一次只练 2–4 小节，不要从头到尾硬磕。</li>
+            <li><b>降速</b>：把速度调到 60–70%，慢到不会错。</li>
+            <li><b>循环</b>：打开循环，同一段连续弹 10 遍，形成肌肉记忆。</li>
+            <li><b>拼接</b>：两段都能单独弹了，再连起来。</li>
+            <li><b>录音</b>：用手机录一遍，回放时你会立刻听出问题。</li>
+          </ol>
+          <p class="tip">错音不可怕，可怕的是用错误的速度把错误练熟。慢练是唯一捷径。</p>
+        </div>
+
+        <div class="lesson-foot">
+          <button class="btn ghost" type="button" data-complete="songs"><span>标记本节已学</span></button>
+          <a class="next-link" href="#practice">下一节：练习与测验 →</a>
+        </div>
+      </section>
+
+      <!-- ========== 08 练习与测验 ========== -->
+      <section class="section" id="practice" data-title="练习与测验">
+        <div class="section-head">
+          <p class="eyebrow">08 / 坚持</p>
+          <h2>每天 20 分钟，<em>两周能弹一首歌</em></h2>
+          <p class="lead">练琴不是「有空才练」，是「每天固定时间练一点」。下面这份计划和自测，帮你把练习变成习惯。</p>
+        </div>
+
+        <div class="grid two">
+          <div class="card">
+            <div class="card-head"><h3>今日 20 分钟</h3><span class="hint" id="todayLabel">—</span></div>
+            <div class="plan-list" id="planList"></div>
+            <div class="plan-bar"><i data-plan-bar style="width:0%"></i></div>
+            <p class="tip">顺序可以换，但每天都要有「和弦 + 节奏 + 曲目」这三样。</p>
+          </div>
+          <div class="card">
+            <h3>7 天入门路线</h3>
+            <div class="day-table" id="dayTable"></div>
+          </div>
+        </div>
+
+        <div class="section-sub">
+          <h3>自测：你真的记住了吗</h3>
+          <p class="muted">找音练指板记忆，听音练耳朵。不用追求满分，错了就点「再听一次」。</p>
+        </div>
+        <div id="quizMount"></div>
+
+        <div class="card">
+          <h3>新手最常问的四个问题</h3>
+          <div class="faq">
+            <details>
+              <summary>手指按不响、有杂音，怎么办？</summary>
+              <p>按顺序检查三件事：① 按的位置是不是在品丝左侧 1–2mm；② 手指有没有立起来，指肚有没有碰到旁边的弦；③ 力度够不够。大部分「按不响」不是力气问题，是位置问题。</p>
+            </details>
+            <details>
+              <summary>手指疼是正常的吗？</summary>
+              <p>前两周指尖疼是正常的，起茧之后就不疼了。但如果是关节刺痛，立刻停，休息一天。每天 20 分钟、分两次练，比一次练一小时更不容易伤手。</p>
+            </details>
+            <details>
+              <summary>和弦换不快，怎么练？</summary>
+              <p>三个技巧：① 找两个和弦的<b>共同手指</b>，能不动就不动；② 换和弦时<b>先动低音弦</b>，扫弦从低音开始；③ 眼睛提前看下一个和弦。然后用节拍器，4 拍换一个，慢到能跟上。</p>
+            </details>
+            <details>
+              <summary>先学乐理还是先学弹？</summary>
+              <p>同时进行，但以弹为主。每学一个和弦，知道它由哪三个音组成就够了；每学一个音阶，知道它在指板上的位置就够了。纯看乐理书不动手，进步会很慢。</p>
+            </details>
+          </div>
+        </div>
+
+        <div class="closing">
+          <p class="eyebrow">最后一句</p>
+          <h3>慢就是快。</h3>
+          <p>把每一个音弹干净，把每一拍数清楚，剩下的交给时间。两周后，你会有一首能完整弹完的歌。</p>
+        </div>
+
+        <div class="lesson-foot">
+          <button class="btn ghost" type="button" data-complete="practice"><span>标记本节已学</span></button>
+          <a class="next-link" href="#start">回到开头 ↑</a>
+        </div>
+      </section>
+
+      <footer class="site-foot">
+        <span>吉他自习室 · 所有声音由浏览器实时合成，不需要任何音频文件</span>
+        <span>建议戴耳机，能听清弦的细节</span>
+      </footer>
+    </div>
+  </main>
+</div>
+
+<script src="assets/data.js"></script>
+<script src="assets/i18n.js"></script>
+<script src="assets/audio.js"></script>
+<script src="assets/visuals.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
