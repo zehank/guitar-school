@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f0d0b'/%3E%3Cpath d='M16 5l4 6v5h-8v-5z' fill='%23eeb96f'/%3E%3Ccircle cx='16' cy='21' r='6' fill='%23eeb96f'/%3E%3C/svg%3E">
 <title>吉他自习室 · 从零到能弹一首歌</title>
 <meta name="description" content="一个可以点、可以听、可以跟着弹的吉他从零教学站：交互指板、调音器、和弦库、节拍器和逐音高亮的曲谱。">
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/style.css?v=20261019b">
 </head>
 <body>
 <div class="grain" aria-hidden="true"></div>
@@ -399,7 +399,7 @@
 
         <div class="card virtual-card">
           <div class="card-head"><h3>虚拟吉他</h3><span class="hint">鼠标 / 触屏 / 键盘</span></div>
-          <div id="virtualMount"></div>
+          <div id="virtualMount"><p class="vg-loading">正在加载虚拟吉他…</p></div>
         </div>
 
         <div class="grid three">
@@ -506,10 +506,24 @@
   </main>
 </div>
 
-<script src="assets/data.js"></script>
-<script src="assets/i18n.js"></script>
-<script src="assets/audio.js"></script>
-<script src="assets/visuals.js"></script>
-<script src="assets/app.js"></script>
+<script src="assets/data.js?v=20261019b"></script>
+<script src="assets/i18n.js?v=20261019b"></script>
+<script src="assets/audio.js?v=20261019b"></script>
+<script src="assets/visuals.js?v=20261019b"></script>
+<script src="assets/app.js?v=20261019b"></script>
+
+<script>
+(function () {
+  setTimeout(function () {
+    var mount = document.getElementById('virtualMount');
+    if (!mount || !mount.querySelector('.vg-loading')) return;
+    try {
+      if (sessionStorage.getItem('vg-cache-fix')) return;
+      sessionStorage.setItem('vg-cache-fix', '1');
+    } catch (e) { return; }
+    location.replace(location.pathname + '?v=' + Date.now() + location.hash);
+  }, 1200);
+})();
+</script>
 </body>
 </html>
