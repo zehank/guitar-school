@@ -59,13 +59,15 @@
     const activeNav = navLinks.find((a) => a.getAttribute('data-nav') === target.id);
     if (activeNav && window.innerWidth <= 1040) {
       const nav = activeNav.parentElement;
-      requestAnimationFrame(() => {
+      const syncNav = () => {
         const r = activeNav.getBoundingClientRect();
         const nr = nav.getBoundingClientRect();
         if (r.left < nr.left || r.right > nr.right) {
           nav.scrollLeft += (r.left + r.width / 2) - (nr.left + nr.width / 2);
         }
-      });
+      };
+      requestAnimationFrame(syncNav);
+      setTimeout(syncNav, 160);
     }
     if (sectionIndexEl) sectionIndexEl.textContent = (target.querySelector('.eyebrow').textContent.split('/')[0] || '').trim();
     if (sectionTitleEl) sectionTitleEl.textContent = target.getAttribute('data-title') || '';
@@ -1384,7 +1386,262 @@
     });
     loadSong(D.SONGS[0].id);
   }
+
+  /* ============================================================
+     无琴模式 · 虚拟吉他
+     ============================================================ */
+  function initVirtualGuitar() {
+    const mount = $('#virtualMount');
+    if (!mount) return;
+
+    const OPEN = {
+      id: 'open',
+      name: I18N.t('openChord', '空弦'),
+      full: I18N.t('openChordFull', '空弦 · 六根都不按'),
+      frets: [0, 0, 0, 0, 0, 0],
+      fingers: [0, 0, 0, 0, 0, 0]
+    };
+    let selectedId = 'C';
+    let pattern = D.STRUM_PATTERNS[0];
+    let bpm = 70;
+    let clock = null;
+    let running = false;
+    let dragging = false;
+    let lastString = null;
+
+    const patternOptions = D.STRUM_PATTERNS.map((p) =>
+      '<option value="' + p.id + '">' + I18N.pattern(p).name + '</option>'
+    ).join('');
+
+    mount.innerHTML =
+      '<div class="vg">' +
+        '<div class="vg-top">' +
+          '<div class="vg-chords" data-vg-chords></div>' +
+          '<div class="vg-now" data-vg-now></div>' +
+        '</div>' +
+        '<div class="vg-body">' +
+          '<div class="vg-diagram" data-vg-diagram></div>' +
+          '<div class="vg-play">' +
+            '<div class="vg-pad" data-vg-pad aria-label="' + I18N.t('virtualPad', '虚拟吉他弦') + '"></div>' +
+            '<div class="vg-actions">' +
+              '<button type="button" class="btn small" data-vg-down>' + I18N.t('virtualDown', '下扫 ↓') + '</button>' +
+              '<button type="button" class="btn small ghost" data-vg-up>' + I18N.t('virtualUp', '上扫 ↑') + '</button>' +
+              '<label class="field range">BPM <input type="range" min="50" max="120" step="2" value="70" data-vg-bpm><b data-vg-bpmval>70</b></label>' +
+              '<label class="field">' + I18N.t('virtualPattern', '节奏型') + ' <select data-vg-pattern>' + patternOptions + '</select></label>' +
+              '<button type="button" class="btn small ghost" data-vg-loop>' + I18N.t('virtualLoop', '跟拍') + '</button>' +
+            '</div>' +
+            '<div class="vg-beats" data-vg-beats></div>' +
+            '<p class="vg-hint">' + I18N.t('virtualHint', '点弦听单音 · 按住拖动逐根拨 · 空格下扫 · Shift+空格上扫 · 数字 1–6 拨单弦') + '</p>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    const chordsEl = $('[data-vg-chords]', mount);
+    const nowEl = $('[data-vg-now]', mount);
+    const diagramEl = $('[data-vg-diagram]', mount);
+    const padEl = $('[data-vg-pad]', mount);
+    const beatsEl = $('[data-vg-beats]', mount);
+    const bpmInput = $('[data-vg-bpm]', mount);
+    const bpmVal = $('[data-vg-bpmval]', mount);
+    const patternSel = $('[data-vg-pattern]', mount);
+    const loopBtn = $('[data-vg-loop]', mount);
+
+    patternSel.value = pattern.id;
+
+    const current = () => selectedId === 'open' ? OPEN : I18N.chord(D.CHORD_MAP[selectedId]);
+    const currentFrets = () => current().frets;
+
+    const ids = ['open'].concat(D.CHORDS.map((c) => c.id));
+    chordsEl.innerHTML = ids.map((id) => {
+      const c = id === 'open' ? OPEN : I18N.chord(D.CHORD_MAP[id]);
+      return '<button type="button" class="chip vg-chip" data-vg-chord="' + id + '">' + c.name + '</button>';
+    }).join('');
+
+    function setNow() {
+      nowEl.innerHTML = '<b>' + current().full + '</b> · ' + I18N.pattern(pattern).name + ' · ' + bpm + ' BPM';
+    }
+
+    function renderBeats() {
+      beatsEl.innerHTML = '';
+      for (let i = 0; i < pattern.meter; i++) {
+        const d = document.createElement('i');
+        d.className = 'vg-beat';
+        beatsEl.appendChild(d);
+      }
+    }
+
+    function setBeat(beat) {
+      $$('.vg-beat', beatsEl).forEach((d, i) => d.classList.toggle('is-on', i === beat));
+    }
+
+    function renderChord() {
+      const c = current();
+      $$('[data-vg-chord]', chordsEl).forEach((b) => {
+        b.classList.toggle('is-on', b.getAttribute('data-vg-chord') === selectedId);
+      });
+      diagramEl.innerHTML = '';
+      diagramEl.appendChild(V.chordSVG(c));
+      const label = document.createElement('div');
+      label.className = 'vg-chord-name';
+      label.textContent = c.full;
+      diagramEl.appendChild(label);
+
+      padEl.innerHTML = '';
+      for (let s = 1; s <= 6; s++) {
+        const f = c.frets[6 - s];
+        const muted = f < 0;
+        const info = muted ? null : D.noteAt(s, f);
+        const row = document.createElement('div');
+        row.className = 'vg-string' + (muted ? ' is-muted' : '');
+        row.setAttribute('data-s', String(s));
+        row.innerHTML =
+          '<span class="vs-key">' + s + '</span>' +
+          '<span class="vs-name">' + D.STRING_NOTE[s] + '</span>' +
+          '<span class="vs-line" style="height:' + [1, 1.2, 1.5, 1.8, 2.3, 2.8][s - 1] + 'px"></span>' +
+          '<span class="vs-fret">' + (muted ? '×' : f) + '</span>' +
+          '<span class="vs-note">' + (muted ? '—' : info.name + info.octave) + '</span>';
+        padEl.appendChild(row);
+      }
+      setNow();
+    }
+
+    function playString(s, gain) {
+      const f = currentFrets()[6 - s];
+      if (f < 0) return;
+      A.playString(s, f, { gain: gain == null ? 0.7 : gain });
+      const row = padEl.querySelector('.vg-string[data-s="' + s + '"]');
+      if (row) {
+        row.classList.add('is-on');
+        setTimeout(() => row.classList.remove('is-on'), 130);
+      }
+    }
+
+    chordsEl.addEventListener('click', (e) => {
+      const b = e.target.closest ? e.target.closest('[data-vg-chord]') : null;
+      if (!b) return;
+      selectedId = b.getAttribute('data-vg-chord');
+      A.ensure();
+      renderChord();
+      A.strum(currentFrets(), 'down', { gain: 0.45 });
+    });
+
+    padEl.addEventListener('pointerdown', (e) => {
+      const row = e.target.closest ? e.target.closest('.vg-string') : null;
+      if (!row) return;
+      e.preventDefault();
+      dragging = true;
+      lastString = parseInt(row.getAttribute('data-s'), 10);
+      try { padEl.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+      playString(lastString, 0.72);
+    });
+
+    padEl.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const el = document.elementFromPoint(e.clientX, e.clientY);
+      const row = el && el.closest ? el.closest('.vg-string') : null;
+      if (!row) return;
+      const s = parseInt(row.getAttribute('data-s'), 10);
+      if (s === lastString) return;
+      const step = s > lastString ? 1 : -1;
+      for (let x = lastString + step; x !== s + step; x += step) playString(x, 0.68);
+      lastString = s;
+    });
+
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach((ev) => {
+      padEl.addEventListener(ev, () => { dragging = false; lastString = null; });
+    });
+
+    $('[data-vg-down]', mount).addEventListener('click', () => {
+      A.ensure();
+      A.strum(currentFrets(), 'down', { gain: 0.55 });
+    });
+    $('[data-vg-up]', mount).addEventListener('click', () => {
+      A.ensure();
+      A.strum(currentFrets(), 'up', { gain: 0.5 });
+    });
+
+    function setLoopUI() {
+      loopBtn.textContent = running ? I18N.t('virtualLoopStop', '停止') : I18N.t('virtualLoop', '跟拍');
+      loopBtn.classList.toggle('is-playing', running);
+    }
+
+    function stopLoop() {
+      running = false;
+      if (clock) { clock.stop(); clock = null; }
+      setLoopUI();
+      setBeat(-1);
+    }
+
+    function startLoop() {
+      if (running) { stopLoop(); return; }
+      A.ensure();
+      stopAllPlayers(null);
+      running = true;
+      setLoopUI();
+      renderBeats();
+      clock = new BeatClock({
+        bpm: bpm,
+        beatsPerBar: pattern.meter,
+        subdivision: 2,
+        onTick: (info) => {
+          const slot = info.beat * 2 + info.sub;
+          const hit = pattern.hits.find((h) => h.slot === slot);
+          if (hit) {
+            A.strum(currentFrets(), hit.dir === 'D' ? 'down' : 'up', {
+              when: info.time, gain: 0.28, gap: 0.02
+            });
+          }
+          if (info.sub === 0) A.click(info.time, info.beat === 0, 0.09);
+        },
+        onVisual: (info) => setBeat(info.beat)
+      });
+      clock.start();
+    }
+
+    loopBtn.addEventListener('click', startLoop);
+
+    bpmInput.addEventListener('input', () => {
+      bpm = parseInt(bpmInput.value, 10);
+      bpmVal.textContent = bpm;
+      setNow();
+      if (running) { stopLoop(); startLoop(); }
+    });
+
+    patternSel.addEventListener('change', () => {
+      pattern = D.STRUM_PATTERNS.find((p) => p.id === patternSel.value) || pattern;
+      renderBeats();
+      setNow();
+      if (running) { stopLoop(); startLoop(); }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      const active = document.querySelector('.section.is-active');
+      if (!active || active.id !== 'virtual') return;
+      const tag = (e.target.tagName || '').toLowerCase();
+      const typing = tag === 'input' || tag === 'select' || tag === 'textarea';
+      if (e.code === 'Space') {
+        if (typing || tag === 'button') return;
+        e.preventDefault();
+        A.ensure();
+        A.strum(currentFrets(), e.shiftKey ? 'up' : 'down', { gain: 0.6 });
+        return;
+      }
+      if (/^[1-6]$/.test(e.key)) {
+        if (typing) return;
+        e.preventDefault();
+        A.ensure();
+        playString(parseInt(e.key, 10), 0.72);
+      }
+    });
+
+    renderChord();
+    renderBeats();
+    setLoopUI();
+    stoppers.push(stopLoop);
+  }
+
   initSongs();
+  initVirtualGuitar();
 
   /* ============================================================
      练习计划

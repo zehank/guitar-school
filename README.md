@@ -8,8 +8,10 @@ dependencies, no audio files: every note is synthesised in the browser.
 
 ## What's inside
 
-- Eight lessons: anatomy, posture, tuning, notes & scales, chords, rhythm, songs, practice
+- Nine lessons: anatomy, posture, tuning, notes & scales, chords, rhythm, songs, virtual guitar, practice
 - Clickable fretboard that plays every note
+- A virtual guitar for when you don't have an instrument: chord chips, a strum pad, keyboard controls and a play-along loop
+- A first-guitar buying guide (budget, size, action, what to try)
 - Live microphone tuner + reference tones + tuning by ear
 - 13 chord shapes with fingerings, tips and common mistakes
 - 4 play-along songs with per-note highlighting on the tab and fretboard
