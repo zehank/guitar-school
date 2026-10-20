@@ -10,6 +10,14 @@
   const I18N = window.I18N || { isEN: false, t: function (k, z, v) { return z; }, chord: function (c) { return c; }, song: function (s) { return s; }, ex: function (e) { return e; }, pattern: function (p) { return p; }, progression: function (p) { return p; } };
   const $ = (sel, root) => (root || document).querySelector(sel);
   const $$ = (sel, root) => Array.prototype.slice.call((root || document).querySelectorAll(sel));
+  function escapeHtml(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
 
   /* ============================================================
      本地进度
@@ -21,6 +29,9 @@
   state.checks = state.checks || {};
   state.plan = state.plan || {};
   state.quiz = state.quiz || { findBest: 0, earBest: 0, chordBest: 0 };
+  state.songs = (Array.isArray(state.songs) ? state.songs : []).filter((song) =>
+    song && typeof song.title === 'string' && Array.isArray(song.steps) && song.steps.length
+  );
   function save() {
     try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* 忽略隐私模式 */ }
   }
@@ -473,11 +484,15 @@
         }
       }
       if (!silentNow) {
-        this.nowEl.innerHTML = st.notes.map((nt) => {
-          const n = D.noteAt(nt.s, nt.f);
-          return '<span class="now-note"><b>' + I18N.t('stringFret', '{s} 弦 {f} 品', { s: nt.s, f: nt.f }) + '</b>' + n.label +
-            (n.solfege ? '<em>' + n.solfege + '</em>' : '') + '</span>';
-        }).join('');
+        if (!st.notes.length) {
+          this.nowEl.textContent = I18N.t('rest', '休止');
+        } else {
+          this.nowEl.innerHTML = st.notes.map((nt) => {
+            const n = D.noteAt(nt.s, nt.f);
+            return '<span class="now-note"><b>' + I18N.t('stringFret', '{s} 弦 {f} 品', { s: nt.s, f: nt.f }) + '</b>' + n.label +
+              (n.solfege ? '<em>' + n.solfege + '</em>' : '') + '</span>';
+          }).join('');
+        }
       }
       if (this.tabScroll) {
         const col = this.tabApi.cols[i];
@@ -1344,13 +1359,22 @@
   function initSongs() {
     const list = $('#songList');
     const mount = $('#playerMount');
-    if (!list || !mount) return;
+    if (!list || !mount) return null;
     let songPlayer = null;
+    let activeId = null;
 
-    function loadSong(id) {
-      const raw = D.SONGS.find((s) => s.id === id) || D.SONGS[0];
-      const song = I18N.song(raw);
-      $$('.song-chip', list).forEach((b) => b.classList.toggle('is-on', b.getAttribute('data-song') === id));
+    const allSongs = () => D.SONGS.concat(state.songs);
+    const getUserSongs = () => state.songs;
+
+    function setActive(id) {
+      activeId = id;
+      $$('.song-chip', list).forEach((b) => {
+        b.classList.toggle('is-on', b.getAttribute('data-song') === id);
+      });
+    }
+
+    function renderSong(raw) {
+      const song = raw.custom ? raw : I18N.song(raw);
       if (songPlayer) {
         songPlayer.pause(true);
         const i = players.indexOf(songPlayer);
@@ -1358,34 +1382,408 @@
         songPlayer = null;
       }
       mount.innerHTML = '';
+      const title = escapeHtml(song.title);
+      const subtitle = escapeHtml(song.subtitle || '');
+      let desc;
+      let tip = '';
+      if (raw.custom) {
+        desc = (subtitle ? subtitle + ' · ' : '') + I18N.t('customTab', '自定义') + ' · ' + song.bpm + ' BPM';
+      } else {
+        desc = escapeHtml(song.subtitle + ' · ' + song.key + ' · ' + song.level);
+        tip = escapeHtml((song.tips || []).join(I18N.isEN ? ' · ' : '  '));
+      }
       songPlayer = new TabPlayer(mount, {
-        title: song.title,
-        desc: song.subtitle + ' · ' + song.key + ' · ' + song.level,
-        tip: song.tips.join(I18N.isEN ? ' · ' : '  '),
+        title: title,
+        desc: desc,
+        tip: tip,
         steps: song.steps,
         bpm: song.bpm,
         beatsPerBar: song.beatsPerBar,
         onFinish: () => {
+          if (song.id === 'preview') return;
           state.played = state.played || {};
-          state.played[id] = true;
+          state.played[song.id] = true;
           save();
           updateAchievements();
         }
       });
+      setActive(raw.id);
     }
 
-    D.SONGS.forEach((raw, i) => {
-      const song = I18N.song(raw);
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'song-chip' + (i === 0 ? ' is-on' : '');
-      b.setAttribute('data-song', song.id);
-      b.innerHTML = '<b>' + song.title + '</b><span>' + song.level + ' · ' + song.key + '</span>';
-      b.addEventListener('click', () => loadSong(song.id));
-      list.appendChild(b);
-    });
+    function loadSong(id) {
+      const raw = allSongs().find((song) => song.id === id);
+      if (raw) renderSong(raw);
+    }
+
+    function renderPicker() {
+      list.innerHTML = '';
+      allSongs().forEach((raw) => {
+        const song = raw.custom ? raw : I18N.song(raw);
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'song-chip';
+        b.setAttribute('data-song', raw.id);
+        const meta = raw.custom
+          ? I18N.t('customTab', '自定义') + ' · ' + song.bpm + ' BPM'
+          : song.level + ' · ' + song.key;
+        b.innerHTML = '<b>' + escapeHtml(song.title) + '</b><span>' + escapeHtml(meta) + '</span>';
+        b.addEventListener('click', () => loadSong(raw.id));
+        list.appendChild(b);
+      });
+      setActive(activeId);
+    }
+
+    function preview(song) {
+      renderSong(Object.assign({}, song, { id: 'preview', custom: true }));
+    }
+
+    function addUserSong(song) {
+      if (state.songs.length >= 30) return null;
+      const saved = Object.assign({}, song, { id: 'user-' + Date.now(), custom: true });
+      state.songs.push(saved);
+      save();
+      renderPicker();
+      renderSong(saved);
+      return saved;
+    }
+
+    function removeUserSong(id) {
+      const wasActive = activeId === id;
+      state.songs = state.songs.filter((song) => song.id !== id);
+      save();
+      renderPicker();
+      if (wasActive) loadSong(D.SONGS[0].id);
+    }
+
+    renderPicker();
     loadSong(D.SONGS[0].id);
+    return { loadSong, renderPicker, preview, addUserSong, removeUserSong, getUserSongs, renderSong };
   }
+
+  /* ============================================================
+     导入谱子
+     ============================================================ */
+  function initImport(api) {
+    if (!api) return;
+    const box = $('#importBox');
+    if (!box) return;
+    const textarea = $('[data-import-text]');
+    const fileInput = $('[data-import-file]');
+    const btnValidate = $('[data-import-validate]');
+    const btnSave = $('[data-import-save]');
+    const btnClear = $('[data-import-clear]');
+    const btnPrompt = $('[data-import-prompt]');
+    const statusEl = $('[data-import-status]');
+    const errorsEl = $('[data-import-errors]');
+    const songsEl = $('[data-import-songs]');
+    if (!textarea || !btnValidate || !btnSave || !btnClear || !statusEl || !errorsEl || !songsEl) return;
+
+    let previewSong = null;
+    const sample = {
+      format: 'guitar-tab/v1',
+      title: 'My melody',
+      bpm: 90,
+      beatsPerBar: 4,
+      tuning: 'EADGBE',
+      steps: [
+        { notes: [{ string: 1, fret: 0 }], beats: 1 },
+        { notes: [{ string: 1, fret: 1 }], beats: 1 },
+        { notes: [{ string: 2, fret: 3 }], beats: 2 }
+      ]
+    };
+
+    function setStatus(text, kind) {
+      statusEl.textContent = text || '';
+      statusEl.className = 'import-status' + (kind ? ' ' + kind : '');
+    }
+
+    function setErrors(list) {
+      errorsEl.innerHTML = '';
+      list.slice(0, 12).forEach((msg) => {
+        const li = document.createElement('li');
+        li.textContent = msg;
+        errorsEl.appendChild(li);
+      });
+    }
+
+    function setSave(on) { btnSave.disabled = !on; }
+    function resetPreview() { previewSong = null; setSave(false); }
+
+    function validateTab(data) {
+      const errors = [];
+      const push = (msg) => { if (errors.length < 12) errors.push(msg); };
+      if (!data || typeof data !== 'object' || Array.isArray(data)) {
+        return { errors: [I18N.t('errObject', '导入数据必须是一个 JSON 对象。')] };
+      }
+      if (data.format !== 'guitar-tab/v1') {
+        push(I18N.t('errFormat', 'format 必须是 guitar-tab/v1'));
+      }
+      const title = typeof data.title === 'string' ? data.title.trim() : '';
+      if (!title || title.length > 80) {
+        push(I18N.t('errTitle', 'title 不能为空（最多 80 字）'));
+      }
+      const subtitle = typeof data.subtitle === 'string' ? data.subtitle.trim().slice(0, 120) : '';
+      const bpm = Number(data.bpm);
+      if (!Number.isFinite(bpm) || bpm < 30 || bpm > 240) {
+        push(I18N.t('errBpm', 'bpm 必须在 30–240 之间'));
+      }
+      const bpb = Number(data.beatsPerBar);
+      const meterOk = Number.isInteger(bpb) && bpb >= 2 && bpb <= 8;
+      if (!meterOk) {
+        push(I18N.t('errMeter', 'beatsPerBar 必须是 2–8 的整数'));
+      }
+      const tuning = String(data.tuning || 'EADGBE').toUpperCase();
+      if (tuning !== 'EADGBE') {
+        push(I18N.t('errTuning', 'tuning 只支持 EADGBE'));
+      }
+      const steps = [];
+      if (!Array.isArray(data.steps) || !data.steps.length) {
+        push(I18N.t('errSteps', 'steps 必须是非空数组'));
+      } else if (data.steps.length > 2000) {
+        push(I18N.t('errTooMany', 'steps 不能超过 2000 个'));
+      } else {
+        let total = 0;
+        data.steps.forEach((st, idx) => {
+          const n = idx + 1;
+          if (!st || typeof st !== 'object' || Array.isArray(st)) {
+            push(I18N.t('errStep', '第 {n} 个 step 格式不对', { n: n }));
+            return;
+          }
+          if (!Array.isArray(st.notes)) {
+            push(I18N.t('errNotes', '第 {n} 个 step 的 notes 必须是数组', { n: n }));
+            return;
+          }
+          const beats = Number(st.beats);
+          if (!Number.isFinite(beats) || beats < 0.25 || beats > 8 || Math.abs(beats * 4 - Math.round(beats * 4)) > 1e-9) {
+            push(I18N.t('errBeats', '第 {n} 个 step 的 beats 必须是 0.25 的倍数（0.25–8）', { n: n }));
+            return;
+          }
+          if (st.notes.length > 6) {
+            push(I18N.t('errNotesMax', '第 {n} 个 step 最多 6 个音', { n: n }));
+          }
+          const seen = new Set();
+          const notes = [];
+          st.notes.forEach((note) => {
+            if (!note || typeof note !== 'object') {
+              push(I18N.t('errStep', '第 {n} 个 step 格式不对', { n: n }));
+              return;
+            }
+            const s = Number(note.string);
+            const f = Number(note.fret);
+            if (!Number.isInteger(s) || s < 1 || s > 6) {
+              push(I18N.t('errString', '第 {n} 个 step：string 必须是 1–6', { n: n }));
+              return;
+            }
+            if (!Number.isInteger(f) || f < 0 || f > 15) {
+              push(I18N.t('errFret', '第 {n} 个 step：fret 必须是 0–15 的整数', { n: n }));
+              return;
+            }
+            if (seen.has(s)) {
+              push(I18N.t('errDup', '第 {n} 个 step：同一根弦只能有一个音', { n: n }));
+              return;
+            }
+            seen.add(s);
+            notes.push({ s: s, f: f });
+          });
+          steps.push({ notes: notes, beats: beats });
+          total += beats;
+        });
+        if (meterOk && Math.abs(total / bpb - Math.round(total / bpb)) > 1e-6) {
+          push(I18N.t('errTotal', '总拍数 {t} 不是 beatsPerBar ({b}) 的整数倍', { t: total, b: bpb }));
+        }
+      }
+      if (errors.length) return { errors: errors };
+      return {
+        errors: [],
+        song: {
+          title: title,
+          subtitle: subtitle,
+          bpm: bpm,
+          beatsPerBar: bpb,
+          tuning: tuning,
+          steps: steps,
+          custom: true
+        }
+      };
+    }
+
+    function aiPrompt() {
+      const schema = JSON.stringify(sample, null, 2);
+      if (I18N.isEN) {
+        return [
+          'You are a guitar tab converter. Convert the tab image into exactly one JSON object that matches the format below.',
+          'Output JSON only — no markdown fences, no explanation.',
+          '',
+          'Rules:',
+          '- string 1 = the thinnest high E string, string 6 = the thickest low E string',
+          '- fret 0 = open string; frets 1–15',
+          '- beats are measured in quarter notes; use multiples of 0.25; every bar must sum to beatsPerBar',
+          '- melody only: at most one note per string per step; use an empty notes array for a rest',
+          '- no tuplets, bends, slides, or grace notes; when unsure choose the simplest reading',
+          '- output one JSON object with the exact keys shown',
+          '',
+          'Example:',
+          schema
+        ].join('\n');
+      }
+      return [
+        '你是一个吉他六线谱转换器。请把图片里的谱子转换成严格符合下面格式的一个 JSON 对象。',
+        '只输出 JSON，不要 Markdown 代码块，不要解释。',
+        '',
+        '规则：',
+        '- string：1 = 最细的高音 e 弦，6 = 最粗的低音 E 弦',
+        '- fret：0 = 空弦，1–15 品',
+        '- beats：以四分音符为 1，只使用 0.25 的倍数；每小节总拍数必须等于 beatsPerBar',
+        '- 只转成单声部旋律：同一拍每根弦最多一个音；休止用空 notes 数组',
+        '- 不要三连音、推弦、滑音、装饰音；不确定时选最简单的读法',
+        '- 只输出一个 JSON 对象，键名与示例一致',
+        '',
+        '示例：',
+        schema
+      ].join('\n');
+    }
+
+    function copyText(text) {
+      function fallback() {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.top = '-1000px';
+        document.body.appendChild(ta);
+        ta.select();
+        let ok = false;
+        try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+        ta.remove();
+        setStatus(ok ? I18N.t('importCopied', '已复制提示词') : I18N.t('importCopyFail', '复制失败，手动选中下面的标准'), ok ? 'is-good' : 'is-bad');
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          setStatus(I18N.t('importCopied', '已复制提示词'), 'is-good');
+        }).catch(fallback);
+      } else {
+        fallback();
+      }
+    }
+
+    function renderMySongs() {
+      const songs = api.getUserSongs();
+      songsEl.innerHTML = '';
+      const title = document.createElement('div');
+      title.className = 'import-songs-title';
+      title.textContent = I18N.t('myTabs', '我的谱子') + ' (' + songs.length + ')';
+      songsEl.appendChild(title);
+      if (!songs.length) {
+        const p = document.createElement('p');
+        p.className = 'import-note';
+        p.textContent = I18N.t('noTabs', '还没有导入的谱子');
+        songsEl.appendChild(p);
+        return;
+      }
+      songs.forEach((song) => {
+        const row = document.createElement('div');
+        row.className = 'user-song';
+        const label = document.createElement('span');
+        label.textContent = song.title;
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.textContent = I18N.t('deleteTab', '删除');
+        del.addEventListener('click', () => {
+          api.removeUserSong(song.id);
+          renderMySongs();
+        });
+        row.appendChild(label);
+        row.appendChild(del);
+        songsEl.appendChild(row);
+      });
+    }
+
+    btnValidate.addEventListener('click', () => {
+      setErrors([]);
+      resetPreview();
+      const raw = textarea.value.trim();
+      if (!raw) {
+        setStatus(I18N.t('importEmpty', '先粘贴 JSON'), 'is-bad');
+        return;
+      }
+      if (raw.length > 200000) {
+        setStatus(I18N.t('importTooLarge', '文件太大（上限 200KB）'), 'is-bad');
+        return;
+      }
+      let data;
+      try {
+        data = JSON.parse(raw);
+      } catch (e) {
+        setStatus(I18N.t('importParse', 'JSON 解析失败：{msg}', { msg: e.message }), 'is-bad');
+        return;
+      }
+      const result = validateTab(data);
+      if (result.errors.length) {
+        setErrors(result.errors);
+        setStatus(I18N.t('importInvalid', '校验没通过，看看下面的错误'), 'is-bad');
+        return;
+      }
+      previewSong = result.song;
+      api.preview(previewSong);
+      setSave(true);
+      setStatus(I18N.t('importPreview', '✓ 校验通过，预览已加载到上方播放器（还没保存）'), 'is-good');
+    });
+
+    btnSave.addEventListener('click', () => {
+      if (!previewSong) return;
+      const saved = api.addUserSong(previewSong);
+      if (!saved) {
+        setStatus(I18N.t('importLimit', '最多保存 30 首，先删掉几首'), 'is-bad');
+        return;
+      }
+      previewSong = saved;
+      setSave(false);
+      setStatus(I18N.t('importSaved', '✓ 已保存到我的曲库'), 'is-good');
+      renderMySongs();
+    });
+
+    btnClear.addEventListener('click', () => {
+      textarea.value = '';
+      resetPreview();
+      setErrors([]);
+      setStatus('');
+    });
+
+    if (btnPrompt) {
+      btnPrompt.addEventListener('click', () => copyText(aiPrompt()));
+    }
+
+    textarea.addEventListener('input', () => {
+      resetPreview();
+      setErrors([]);
+      setStatus('');
+    });
+
+    if (fileInput) {
+      fileInput.addEventListener('change', () => {
+        const file = fileInput.files && fileInput.files[0];
+        if (!file) return;
+        if (file.size > 200000) {
+          setStatus(I18N.t('importTooLarge', '文件太大（上限 200KB）'), 'is-bad');
+          fileInput.value = '';
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+          textarea.value = String(reader.result || '');
+          resetPreview();
+          setErrors([]);
+          setStatus(I18N.t('importLoad', '已载入文件，点「校验并预览」'), 'is-good');
+        };
+        reader.onerror = () => setStatus(I18N.t('importRead', '读取文件失败'), 'is-bad');
+        reader.readAsText(file);
+        fileInput.value = '';
+      });
+    }
+
+    renderMySongs();
+    setSave(false);
+  }
+
 
   /* ============================================================
      无琴模式 · 虚拟吉他
@@ -1617,6 +2015,7 @@
     document.addEventListener('keydown', (e) => {
       const active = document.querySelector('.section.is-active');
       if (!active || active.id !== 'virtual') return;
+      if (e.target.closest && e.target.closest('#fretTrainer')) return;
       const tag = (e.target.tagName || '').toLowerCase();
       const typing = tag === 'input' || tag === 'select' || tag === 'textarea';
       if (e.code === 'Space') {
@@ -1640,8 +2039,153 @@
     stoppers.push(stopLoop);
   }
 
-  initSongs();
+  /* ============================================================
+     按和弦练习
+     ============================================================ */
+  function initFretTrainer() {
+    const mount = $('#fretTrainer');
+    if (!mount) return;
+    const POOL = ['C', 'G', 'D', 'A', 'E', 'Am', 'Em', 'Dm'];
+    const shape = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+    let targetId = 'C';
+    let streak = 0;
+    let best = 0;
+    let nextTimer = null;
+
+    mount.innerHTML =
+      '<div class="fret-layout">' +
+        '<div class="fret-side">' +
+          '<div class="fret-target"><span>' + I18N.t('fretTarget', '目标和弦') + '</span><b data-ft-target></b><em data-ft-full></em></div>' +
+          '<div class="fret-actions">' +
+            '<button type="button" class="btn small" data-ft-check>' + I18N.t('fretCheck', '检查') + '</button>' +
+            '<button type="button" class="btn small ghost" data-ft-listen>' + I18N.t('fretListen', '听目标') + '</button>' +
+            '<button type="button" class="btn small ghost" data-ft-next>' + I18N.t('fretNext', '换一个') + '</button>' +
+            '<button type="button" class="btn small ghost" data-ft-clear>' + I18N.t('fretClear', '清空') + '</button>' +
+          '</div>' +
+          '<p class="fret-feedback" data-ft-feedback></p>' +
+          '<p class="fret-score" data-ft-score></p>' +
+        '</div>' +
+        '<div class="fret-board" data-ft-board></div>' +
+      '</div>';
+
+    const board = $('[data-ft-board]', mount);
+    const targetEl = $('[data-ft-target]', mount);
+    const fullEl = $('[data-ft-full]', mount);
+    const feedbackEl = $('[data-ft-feedback]', mount);
+    const scoreEl = $('[data-ft-score]', mount);
+
+    let boardHtml = '<span class="fret-head"></span>';
+    ['×', '0', '1', '2', '3', '4', '5'].forEach((v) => {
+      boardHtml += '<span class="fret-head">' + v + '</span>';
+    });
+    for (let s = 1; s <= 6; s++) {
+      boardHtml += '<div class="fret-row-label"><b>' + s + '</b>' + D.STRING_NOTE[s] + '</div>';
+      [-1, 0, 1, 2, 3, 4, 5].forEach((f) => {
+        boardHtml += '<button type="button" class="fret-cell' + (f === -1 ? ' is-mute' : '') +
+          '" data-s="' + s + '" data-f="' + f + '">' + (f === -1 ? '×' : f) + '</button>';
+      });
+    }
+    board.innerHTML = boardHtml;
+
+    function startText() {
+      return I18N.t('fretStart', '点格子按出这个和弦，再点「检查」');
+    }
+
+    function valueText(v) {
+      if (v === -1) return I18N.t('fretMute', '不弹');
+      if (v === 0) return '0';
+      return I18N.isEN ? 'fret ' + v : v + ' 品';
+    }
+
+    function setFeedback(text, kind) {
+      feedbackEl.textContent = text;
+      feedbackEl.className = 'fret-feedback' + (kind ? ' ' + kind : '');
+    }
+
+    function currentFrets() {
+      return [shape[6], shape[5], shape[4], shape[3], shape[2], shape[1]];
+    }
+
+    function render() {
+      const target = D.CHORD_MAP[targetId];
+      const local = I18N.chord(target);
+      targetEl.textContent = target.name;
+      fullEl.textContent = local.full;
+      $$('.fret-cell', board).forEach((cell) => {
+        const s = parseInt(cell.getAttribute('data-s'), 10);
+        const f = parseInt(cell.getAttribute('data-f'), 10);
+        cell.classList.toggle('is-on', shape[s] === f);
+      });
+      scoreEl.textContent = I18N.t('fretScore', '连对 {s} · 最高 {b}', { s: streak, b: best });
+    }
+
+    function newTarget() {
+      clearTimeout(nextTimer);
+      let next = targetId;
+      while (next === targetId && POOL.length > 1) {
+        next = POOL[Math.floor(Math.random() * POOL.length)];
+      }
+      targetId = next;
+      for (let s = 1; s <= 6; s++) shape[s] = 0;
+      setFeedback(startText(), '');
+      render();
+    }
+
+    board.addEventListener('click', (e) => {
+      const cell = e.target.closest ? e.target.closest('.fret-cell') : null;
+      if (!cell) return;
+      const s = parseInt(cell.getAttribute('data-s'), 10);
+      const f = parseInt(cell.getAttribute('data-f'), 10);
+      shape[s] = shape[s] === f ? 0 : f;
+      setFeedback(startText(), '');
+      render();
+    });
+
+    $('[data-ft-check]', mount).addEventListener('click', () => {
+      const want = D.CHORD_MAP[targetId].frets;
+      const bad = [];
+      for (let s = 1; s <= 6; s++) {
+        if (shape[s] !== want[6 - s]) bad.push({ s: s, v: want[6 - s] });
+      }
+      A.ensure();
+      if (!bad.length) {
+        streak++;
+        best = Math.max(best, streak);
+        setFeedback(I18N.t('fretCorrect', '✓ 对了 · 这个形状能响'), 'is-good');
+        A.strum(currentFrets(), 'down', { gain: 0.55 });
+        render();
+        clearTimeout(nextTimer);
+        nextTimer = setTimeout(newTarget, 900);
+      } else {
+        streak = 0;
+        const list = bad.slice(0, 4).map((b) =>
+          I18N.t('fretMismatch', '{s} 弦 {v}', { s: b.s, v: valueText(b.v) })
+        ).join(I18N.isEN ? ', ' : '、');
+        setFeedback(I18N.t('fretWrong', '✗ 还差：{list}', { list: list }), 'is-bad');
+        A.strum(currentFrets(), 'down', { gain: 0.4 });
+        render();
+      }
+    });
+
+    $('[data-ft-listen]', mount).addEventListener('click', () => {
+      A.ensure();
+      A.strum(D.CHORD_MAP[targetId].frets, 'down', { gain: 0.55 });
+    });
+
+    $('[data-ft-next]', mount).addEventListener('click', newTarget);
+    $('[data-ft-clear]', mount).addEventListener('click', () => {
+      for (let s = 1; s <= 6; s++) shape[s] = 0;
+      setFeedback(startText(), '');
+      render();
+    });
+
+    newTarget();
+  }
+
+  const songApi = initSongs();
+  initImport(songApi);
   initVirtualGuitar();
+  initFretTrainer();
 
   /* ============================================================
      练习计划

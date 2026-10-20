@@ -355,7 +355,7 @@ window.GuitarVisuals = (function () {
     let totalBeats = 0;
     const cols = [];
     steps.forEach((st, i) => {
-      const w = Math.max(18, st.beats * bw);
+      const w = Math.max(10, st.beats * bw);
       cols.push({ i, x: labelW + totalBeats * bw, w, beat: totalBeats, step: st });
       totalBeats += st.beats;
     });
@@ -399,7 +399,9 @@ window.GuitarVisuals = (function () {
       const x = col.x + Math.min(13, col.w * 0.4);
       col.step.notes.forEach((nt) => {
         const info = D.noteAt(nt.s, nt.f);
-        textEl(svg, x, yFor(nt.s) + 4.2, String(nt.f), { 'text-anchor': 'middle', class: 'tab-fret' });
+        textEl(svg, x, yFor(nt.s) + 4.2, String(nt.f), {
+          'text-anchor': 'middle', class: 'tab-fret' + (col.w < 20 ? ' is-dense' : '')
+        });
         if (opts.showNames) {
           textEl(svg, x, yFor(nt.s) - 8, info.name, { 'text-anchor': 'middle', class: 'tab-name' });
         }

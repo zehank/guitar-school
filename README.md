@@ -10,7 +10,8 @@ dependencies, no audio files: every note is synthesised in the browser.
 
 - Nine lessons: anatomy, posture, tuning, notes & scales, chords, rhythm, songs, virtual guitar, practice
 - Clickable fretboard that plays every note
-- A virtual guitar for when you don't have an instrument: chord chips, a strum pad, keyboard controls and a play-along loop
+- A virtual guitar for when you don't have an instrument: chord chips, a strum pad, keyboard controls, a play-along loop and a fret-the-chord trainer
+- Import your own tabs from a documented JSON format (`guitar-tab/v1`), with a copyable AI prompt, validation, preview and local storage
 - A first-guitar buying guide (budget, size, action, what to try)
 - Live microphone tuner + reference tones + tuning by ear
 - 13 chord shapes with fingerings, tips and common mistakes

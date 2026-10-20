@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f0d0b'/%3E%3Cpath d='M16 5l4 6v5h-8v-5z' fill='%23eeb96f'/%3E%3Ccircle cx='16' cy='21' r='6' fill='%23eeb96f'/%3E%3C/svg%3E">
 <title>吉他自习室 · 从零到能弹一首歌</title>
 <meta name="description" content="一个可以点、可以听、可以跟着弹的吉他从零教学站：交互指板、调音器、和弦库、节拍器和逐音高亮的曲谱。">
-<link rel="stylesheet" href="assets/style.css?v=20261019b">
+<link rel="stylesheet" href="assets/style.css?v=20261019d">
 </head>
 <body>
 <div class="grain" aria-hidden="true"></div>
@@ -371,6 +371,46 @@
         <div class="song-picker" id="songList"></div>
         <div id="playerMount"></div>
 
+        <div class="card import-card">
+          <div class="card-head"><h3>导入自己的谱子</h3><span class="hint">JSON · 只存在本地</span></div>
+          <p class="muted">把任意六线谱图片给 AI，让它按下面的标准生成 JSON，再粘贴进来。导入的谱子只保存在你的浏览器里，不会上传。</p>
+          <details class="import-box" id="importBox">
+            <summary>查看格式标准 / 打开导入</summary>
+            <div class="import-body">
+              <div class="import-spec">
+                <p><code>format</code> 固定为 <code>guitar-tab/v1</code>；<code>title</code> 必填；<code>bpm</code> 30–240；<code>beatsPerBar</code> 2–8；<code>tuning</code> 固定 <code>EADGBE</code>。</p>
+                <p><code>steps</code> 是数组，每个元素：<code>{ "notes": [{ "string": 1–6, "fret": 0–15 }], "beats": 0.25 的倍数 }</code>。每小节总拍数必须是 <code>beatsPerBar</code> 的整数倍；只支持单声部。</p>
+                <pre>{
+  "format": "guitar-tab/v1",
+  "title": "My melody",
+  "bpm": 90,
+  "beatsPerBar": 4,
+  "tuning": "EADGBE",
+  "steps": [
+    { "notes": [{ "string": 1, "fret": 0 }], "beats": 1 },
+    { "notes": [{ "string": 1, "fret": 1 }], "beats": 1 },
+    { "notes": [{ "string": 2, "fret": 3 }], "beats": 2 }
+  ]
+}</pre>
+              </div>
+              <div class="import-actions">
+                <button type="button" class="btn small ghost" data-import-prompt>复制 AI 提示词</button>
+                <label class="btn small ghost import-file">选择 JSON 文件<input type="file" accept=".json,application/json" data-import-file></label>
+              </div>
+              <textarea class="import-text" data-import-text rows="7" placeholder="粘贴 AI 返回的 JSON"></textarea>
+              <div class="import-actions">
+                <button type="button" class="btn small" data-import-validate>校验并预览</button>
+                <button type="button" class="btn small ghost" data-import-save disabled>保存到我的曲库</button>
+                <button type="button" class="btn small ghost" data-import-clear>清空</button>
+              </div>
+              <div class="import-status" data-import-status></div>
+              <ul class="import-errors" data-import-errors></ul>
+              <p class="import-note">只导入你有权使用的谱子；导入内容不会上传到服务器。</p>
+              <div class="import-songs" data-import-songs></div>
+            </div>
+          </details>
+        </div>
+
         <div class="card">
           <h3>一首歌怎么练（照这个顺序）</h3>
           <ol class="steps-list">
@@ -400,6 +440,11 @@
         <div class="card virtual-card">
           <div class="card-head"><h3>虚拟吉他</h3><span class="hint">鼠标 / 触屏 / 键盘</span></div>
           <div id="virtualMount"><p class="vg-loading">正在加载虚拟吉他…</p></div>
+        </div>
+
+        <div class="card fret-card">
+          <div class="card-head"><h3>按和弦练习</h3><span class="hint">点格子按弦 · 再点一次取消</span></div>
+          <div id="fretTrainer"></div>
         </div>
 
         <div class="grid three">
@@ -506,11 +551,11 @@
   </main>
 </div>
 
-<script src="assets/data.js?v=20261019b"></script>
-<script src="assets/i18n.js?v=20261019b"></script>
-<script src="assets/audio.js?v=20261019b"></script>
-<script src="assets/visuals.js?v=20261019b"></script>
-<script src="assets/app.js?v=20261019b"></script>
+<script src="assets/data.js?v=20261019d"></script>
+<script src="assets/i18n.js?v=20261019d"></script>
+<script src="assets/audio.js?v=20261019d"></script>
+<script src="assets/visuals.js?v=20261019d"></script>
+<script src="assets/app.js?v=20261019d"></script>
 
 <script>
 (function () {

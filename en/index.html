@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f0d0b'/%3E%3Cpath d='M16 5l4 6v5h-8v-5z' fill='%23eeb96f'/%3E%3Ccircle cx='16' cy='21' r='6' fill='%23eeb96f'/%3E%3C/svg%3E">
 <title>Guitar Studio · From zero to your first song</title>
 <meta name="description" content="An interactive, visual guitar course: clickable fretboard, live tuner, chord library, metronome and play-along tabs.">
-<link rel="stylesheet" href="../assets/style.css?v=20261019b">
+<link rel="stylesheet" href="../assets/style.css?v=20261019d">
 </head>
 <body>
 <div class="grain" aria-hidden="true"></div>
@@ -371,6 +371,46 @@
         <div class="song-picker" id="songList"></div>
         <div id="playerMount"></div>
 
+        <div class="card import-card">
+          <div class="card-head"><h3>Import your own tab</h3><span class="hint">JSON · stored locally</span></div>
+          <p class="muted">Give any tab image to an AI, ask it to follow the format below, then paste the JSON here. Imports stay in your browser and are never uploaded.</p>
+          <details class="import-box" id="importBox">
+            <summary>View the format / open the importer</summary>
+            <div class="import-body">
+              <div class="import-spec">
+                <p><code>format</code> must be <code>guitar-tab/v1</code>; <code>title</code> is required; <code>bpm</code> 30–240; <code>beatsPerBar</code> 2–8; <code>tuning</code> must be <code>EADGBE</code>.</p>
+                <p><code>steps</code> is an array of <code>{ "notes": [{ "string": 1–6, "fret": 0–15 }], "beats": a multiple of 0.25 }</code>. Every bar must add up to <code>beatsPerBar</code>; melody only.</p>
+                <pre>{
+  "format": "guitar-tab/v1",
+  "title": "My melody",
+  "bpm": 90,
+  "beatsPerBar": 4,
+  "tuning": "EADGBE",
+  "steps": [
+    { "notes": [{ "string": 1, "fret": 0 }], "beats": 1 },
+    { "notes": [{ "string": 1, "fret": 1 }], "beats": 1 },
+    { "notes": [{ "string": 2, "fret": 3 }], "beats": 2 }
+  ]
+}</pre>
+              </div>
+              <div class="import-actions">
+                <button type="button" class="btn small ghost" data-import-prompt>Copy AI prompt</button>
+                <label class="btn small ghost import-file">Choose JSON file<input type="file" accept=".json,application/json" data-import-file></label>
+              </div>
+              <textarea class="import-text" data-import-text rows="7" placeholder="Paste the JSON returned by the AI"></textarea>
+              <div class="import-actions">
+                <button type="button" class="btn small" data-import-validate>Validate &amp; preview</button>
+                <button type="button" class="btn small ghost" data-import-save disabled>Save to my tabs</button>
+                <button type="button" class="btn small ghost" data-import-clear>Clear</button>
+              </div>
+              <div class="import-status" data-import-status></div>
+              <ul class="import-errors" data-import-errors></ul>
+              <p class="import-note">Only import tabs you have the right to use; nothing is uploaded.</p>
+              <div class="import-songs" data-import-songs></div>
+            </div>
+          </details>
+        </div>
+
         <div class="card">
           <h3>How to learn a song (in this order)</h3>
           <ol class="steps-list">
@@ -400,6 +440,11 @@
         <div class="card virtual-card">
           <div class="card-head"><h3>Virtual guitar</h3><span class="hint">Mouse / touch / keyboard</span></div>
           <div id="virtualMount"><p class="vg-loading">Loading the virtual guitar…</p></div>
+        </div>
+
+        <div class="card fret-card">
+          <div class="card-head"><h3>Fret a chord</h3><span class="hint">Tap a cell to fret · tap again to clear</span></div>
+          <div id="fretTrainer"></div>
         </div>
 
         <div class="grid three">
@@ -506,11 +551,11 @@
   </main>
 </div>
 
-<script src="../assets/data.js?v=20261019b"></script>
-<script src="../assets/i18n.js?v=20261019b"></script>
-<script src="../assets/audio.js?v=20261019b"></script>
-<script src="../assets/visuals.js?v=20261019b"></script>
-<script src="../assets/app.js?v=20261019b"></script>
+<script src="../assets/data.js?v=20261019d"></script>
+<script src="../assets/i18n.js?v=20261019d"></script>
+<script src="../assets/audio.js?v=20261019d"></script>
+<script src="../assets/visuals.js?v=20261019d"></script>
+<script src="../assets/app.js?v=20261019d"></script>
 
 <script>
 (function () {
